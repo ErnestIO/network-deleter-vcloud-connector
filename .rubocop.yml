@@ -1,0 +1,23 @@
+Style/Encoding:
+  Enabled: false
+
+Style/ClassVars:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 120
+
+Documentation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 30
+
+AbcSize:
+  Enabled: false
+
+Style/CyclomaticComplexity:
+  Enabled: false
+
+Style/PerceivedComplexity:
+  Enabled: false

@@ -1,0 +1,15 @@
+machine:
+  ruby:
+    version: jruby-1.7.13
+
+dependencies:
+  override:
+    - sudo mkdir -p /opt/ernest-libraries/myst
+    - sudo chmod 777 /opt/ernest-libraries/myst
+    - git clone git@github.com:ErnestIO/myst.git /opt/ernest-libraries/myst
+    - make dev-deps
+
+test:
+  override:
+    - make test
+    - make lint
