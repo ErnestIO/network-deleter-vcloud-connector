@@ -7,7 +7,8 @@ RUN mkdir /opt/ernest-libraries/ && cd /opt/ernest-libraries && git clone https:
 ADD . /opt/ernest/network-deleter-vcloud-connector
 WORKDIR /opt/ernest/network-deleter-vcloud-connector
 
+RUN rm Gemfile Gemfile.lock && mv Gemfile-Docker Gemfile && mv Gemfile-Docker.lock Gemfile.lock
 RUN curl https://s3-eu-west-1.amazonaws.com/ernest-tools/bash-nats -o /bin/bash-nats && chmod +x /bin/bash-nats
-RUN jruby -S bundle install --gemfile=Gemfile-Docker
+RUN jruby -S bundle install
 
 ENTRYPOINT ./run.sh
