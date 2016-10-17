@@ -56,7 +56,7 @@ class NetworkTask
 end
 
 def delete_network(data)
-  values = data.values_at(:datacenter_name, :client_name, :network_name).compact
+  values = data.values_at(:datacenter_name, :client_name, :name).compact
   return false unless data[:router_type] == 'vcloud' && values.length == 3
 
   credentials = data[:datacenter_username].split('@')
@@ -65,7 +65,7 @@ def delete_network(data)
                           username:     credentials.first,
                           password:     data[:datacenter_password])
   datacenter      = provider.datacenter(data[:datacenter_name])
-  network         = datacenter.private_network(data[:network_name])
+  network         = datacenter.private_network(data[:name])
 
   # Filthy hack, because the vcloud sdk doesn't let us delete a network as a non-admin
   return 'network.delete.vcloud.done' if network.network.nil?
