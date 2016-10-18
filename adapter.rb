@@ -56,8 +56,8 @@ class NetworkTask
 end
 
 def delete_network(data)
-  values = data.values_at(:datacenter_name, :client_name, :name).compact
-  return false unless data[:router_type] == 'vcloud' && values.length == 3
+  values = data.values_at(:datacenter_name, :name).compact
+  return false unless data[:router_type] == 'vcloud' && values.length == 2
 
   credentials = data[:datacenter_username].split('@')
   provider = Provider.new(endpoint:     data[:vcloud_url],
