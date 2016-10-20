@@ -20,12 +20,11 @@ describe 'vcloud_network_deleter_microservice' do
         datacenter_name: 'r3-acidre',
         datacenter_password: 'ed7d0a9ffed74b2d3bc88198cbe7948c',
         client_name: 'r3labs-development',
-        network_name: 'cdg-145-salt',
-        network_start_address: '10.64.4.5',
-        network_end_address: '10.64.4.250',
-        network_netmask: '255.255.255.0',
-        network_gateway: '10.64.4.1'
-
+        name: 'cdg-145-salt',
+        start_address: '10.64.4.5',
+        end_address: '10.64.4.250',
+        netmask: '255.255.255.0',
+        gateway: '10.64.4.1'
       }
     end
     let!(:datacenter)       { double('datacenter', private_network: private_network) }
