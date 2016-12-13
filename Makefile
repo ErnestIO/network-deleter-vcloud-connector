@@ -1,7 +1,7 @@
 deps:
 	go get -u github.com/ernestio/bash-nats
 
-dev-deps:
+dev-deps: deps
 	jruby -S bundle install
 
 lint:

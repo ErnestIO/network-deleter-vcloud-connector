@@ -11,7 +11,7 @@ Documentation:
   Enabled: false
 
 Metrics/MethodLength:
-  Max: 30
+  Max: 40
 
 AbcSize:
   Enabled: false
