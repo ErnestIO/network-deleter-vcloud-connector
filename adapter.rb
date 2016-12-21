@@ -55,6 +55,20 @@ class NetworkTask
   end
 end
 
+def delete_network_request(url, token)
+  req = Net::HTTP::Delete.new(url.path)
+  req['x-vcloud-authorization'] = token
+  req['Accept'] = 'application/*+xml;version=5.1'
+
+  http = Net::HTTP.new(url.host, url.port)
+  http.use_ssl = true
+  res = http.start { |h| h.request(req) }
+  fail res.message if res.code != '202'
+
+  # Wait for the delete to finish
+  NetworkTask.new(xml: res.body, http: http, token: token)
+end
+
 def delete_network(data)
   values = data.values_at(:datacenter_name, :name).compact
   return false unless data[:router_type] == 'vcloud' && values.length == 2
@@ -67,23 +81,20 @@ def delete_network(data)
                           username:     credentials.first,
                           password:     pwd)
   datacenter      = provider.datacenter(data[:datacenter_name])
+  router          = datacenter.router(data[:router_name])
   network         = datacenter.private_network(data[:name])
+
+  # wait for all prior tasks to complete
+  router.wait_for_tasks
 
   # Filthy hack, because the vcloud sdk doesn't let us delete a network as a non-admin
   return 'network.delete.vcloud.done' if network.network.nil?
   network_href = network.network.getReference.getHref
   url = URI.parse(network_href.gsub(/network/, 'admin/network'))
-  req = Net::HTTP::Delete.new(url.path)
-  req['x-vcloud-authorization'] = provider.client.vcloud_token
-  req['Accept'] = 'application/*+xml;version=5.1'
 
-  http = Net::HTTP.new(url.host, url.port)
-  http.use_ssl = true
-  res = http.start { |h| h.request(req) }
-  fail res.message if res.code != '202'
+  task = delete_network_request(url,  provider.client.vcloud_token)
 
   # Wait for the delete to finish
-  task = NetworkTask.new(xml: res.body, http: http, token: provider.client.vcloud_token)
   if task.wait_for_task
     'network.delete.vcloud.done'
   else
