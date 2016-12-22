@@ -56,23 +56,24 @@ class NetworkTask
 end
 
 def delete_network_request(url, token)
-  req = Net::HTTP::Delete.new(url.path)
-  req['x-vcloud-authorization'] = token
-  req['Accept'] = 'application/*+xml;version=5.1'
+  5.times do
+    req = Net::HTTP::Delete.new(url.path)
+    req['x-vcloud-authorization'] = token
+    req['Accept'] = 'application/*+xml;version=5.1'
 
-  http = Net::HTTP.new(url.host, url.port)
-  http.use_ssl = true
-  res = http.start { |h| h.request(req) }
-  fail res.message if res.code != '202'
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    res = http.start { |h| h.request(req) }
 
-  # Wait for the delete to finish
-  NetworkTask.new(xml: res.body, http: http, token: token)
+    return NetworkTask.new(xml: res.body, http: http, token: token) if res.code == '202'
+   
+    sleep 10
+  end
+
+  nil
 end
 
 def delete_network(data)
-  values = data.values_at(:datacenter_name, :name).compact
-  return false unless data[:router_type] == 'vcloud' && values.length == 2
-
   usr = ENV['DT_USR'] || data[:datacenter_username]
   pwd = ENV['DT_PWD'] || data[:datacenter_password]
   credentials = usr.split('@')
@@ -95,10 +96,11 @@ def delete_network(data)
   task = delete_network_request(url,  provider.client.vcloud_token)
 
   # Wait for the delete to finish
-  if task.wait_for_task
-    'network.delete.vcloud.done'
+  if task.nil?
+     'network.delete.vcloud.error'
   else
-    'network.delete.vcloud.error'
+     task.wait_for_task
+    'network.delete.vcloud.done'
   end
 rescue => e
   puts e
