@@ -30,11 +30,9 @@ class NetworkTask
       @owner = @xml.at_xpath('/xmlns:Task/xmlns:Owner').get_attribute('href')
     end
 
-    if @xml.at_xpath('/xmlns:Task/xmlns:Progress')
-      @progress = @xml.at_xpath('/xmlns:Task/xmlns:Progress').content
-    else
-      @progress = nil
-    end
+    @progress = if @xml.at_xpath('/xmlns:Task/xmlns:Progress')
+                  @xml.at_xpath('/xmlns:Task/xmlns:Progress').content
+                end
   end
 
   def update
@@ -66,7 +64,7 @@ def delete_network_request(url, token)
     res = http.start { |h| h.request(req) }
 
     return NetworkTask.new(xml: res.body, http: http, token: token) if res.code == '202'
-   
+
     sleep 10
   end
 
@@ -93,13 +91,13 @@ def delete_network(data)
   network_href = network.network.getReference.getHref
   url = URI.parse(network_href.gsub(/network/, 'admin/network'))
 
-  task = delete_network_request(url,  provider.client.vcloud_token)
+  task = delete_network_request(url, provider.client.vcloud_token)
 
   # Wait for the delete to finish
   if task.nil?
-     'network.delete.vcloud.error'
+    'network.delete.vcloud.error'
   else
-     task.wait_for_task
+    task.wait_for_task
     'network.delete.vcloud.done'
   end
 rescue => e
@@ -109,7 +107,7 @@ rescue => e
 end
 
 unless defined? @@test
-  @data       = { id: SecureRandom.uuid, type: ARGV[0] }
+  @data = { id: SecureRandom.uuid, type: ARGV[0] }
   @data.merge! JSON.parse(ARGV[1], symbolize_names: true)
   original_stdout = $stdout
   $stdout = StringIO.new
