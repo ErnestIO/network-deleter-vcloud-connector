@@ -27,7 +27,8 @@ describe 'vcloud_network_deleter_microservice' do
         gateway: '10.64.4.1'
       }
     end
-    let!(:datacenter)       { double('datacenter', private_network: private_network) }
+    let!(:waiter)           { double('waiter', wait_for_tasks: true) }
+    let!(:datacenter)       { double('datacenter', private_network: private_network, router: waiter) }
     let!(:private_network)  { double('private_network', network: network) }
     let!(:network)          { double('network', delete: task, getReference: reference) }
     let!(:reference)        { double('reference', getHref: 'something/network/kk') }
