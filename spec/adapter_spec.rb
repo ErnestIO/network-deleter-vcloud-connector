@@ -13,7 +13,7 @@ describe 'vcloud_network_deleter_microservice' do
   end
 
   describe '#delete_network' do
-    let!(:data)   do
+    let!(:data) do
       { router_name: 'adria-vse',
         router_type: 'vcloud',
         datacenter_username: 'acidre@r3labs-development',
@@ -24,10 +24,10 @@ describe 'vcloud_network_deleter_microservice' do
         start_address: '10.64.4.5',
         end_address: '10.64.4.250',
         netmask: '255.255.255.0',
-        gateway: '10.64.4.1'
-      }
+        gateway: '10.64.4.1' }
     end
-    let!(:datacenter)       { double('datacenter', private_network: private_network) }
+    let!(:waiter)           { double('waiter', wait_for_tasks: true) }
+    let!(:datacenter)       { double('datacenter', private_network: private_network, router: waiter) }
     let!(:private_network)  { double('private_network', network: network) }
     let!(:network)          { double('network', delete: task, getReference: reference) }
     let!(:reference)        { double('reference', getHref: 'something/network/kk') }
